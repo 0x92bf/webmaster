@@ -1,0 +1,95 @@
+{include file='public/_meta'}
+<title>添加节点</title>
+</head>
+<body>
+<article class="page-container">
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>控制器(类名)：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$node}" placeholder="" id="control" name="control">
+            </div>
+        </div>
+<br/>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>控制器名(菜单名)：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$nodename}" placeholder="" id="controlName" name="controlName">
+            </div>
+        </div>
+<br/>
+    <div class="row cl">
+        <label class="form-label col-xs-4 col-sm-3">排序：</label>
+        <div class="formControls col-xs-8 col-sm-9">
+            <input type="number" class="input-text" value="" placeholder="" id="sort" name="sort">
+        </div>
+    </div>
+    <br/>
+    {if condition="($isupdate == 1)"}
+    <div class="row cl">
+        <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+            <button onclick="addControl('editNode')" class="btn btn-success radius" id="" name=""><i class="icon-ok"></i>更新</button>
+        </div>
+    </div>
+    {else/}
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button onclick="addControl('doAddNode')" class="btn btn-success radius" id="" name=""><i class="icon-ok"></i> 确定</button>
+            </div>
+        </div>
+    {/if}
+</article>
+<!--_footer 作为公共模版分离出去-->
+{include file='public/_footer'}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+
+<script type="text/javascript">
+
+    function addControl(a) {
+        var control = $("#control").val();
+        var controlname = $("#controlName").val();
+        var sort = $("#sort").val();
+        var nodeid = '{$nodeid}';
+        if(!control || !controlname){
+            layer.msg("别闹",{
+                icon: 2,
+                time: 3000 //2秒关闭（如果不配置，默认是3秒）
+            }, function(){
+                return;
+            });
+            return;
+        }
+        res={control:control,controlname:controlname,sort:sort};
+        if(nodeid){
+         res.nodeid = nodeid;
+        }
+
+        $.ajax({
+            url:  a,
+            type: "POST",
+            dataType: "json",
+            data: res,
+            success: function (info) {
+                if(info.code){
+                    layer.msg(info.msg,{
+                        icon: 1,
+                        time: 3000 //2秒关闭（如果不配置，默认是3秒）
+                    });
+                }else{
+                    layer.msg(info.msg,{
+                        icon: 2,
+                        time: 3000 //2秒关闭（如果不配置，默认是3秒）
+                    }, function(){
+                        return;
+                    });
+                    return;
+                }
+            }});
+    }
+
+
+</script>
+</body>
+</html>

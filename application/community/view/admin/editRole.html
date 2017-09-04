@@ -1,0 +1,141 @@
+{include file='public/_meta'}
+<title>修改角色</title>
+<script type="text/javascript" src="__PUBLIC__/resources/lib/vue.js"></script>
+</head>
+<body>
+<article class="page-container">
+    <form action="upRoleAcc" method="post" class="form form-horizontal" id="form-admin-role-add">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>角色名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$roleName}" placeholder="" id="roleName" name="roleName">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">备注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="{$remark}" placeholder="" id="" name="remark">
+                <input type="hidden"  value="{$roleid}" name="roleid">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-3">网站角色：</label>
+            <div class="formControls col-xs-8 col-sm-9" id="myvue">
+                {volist name="pack" id="vo"}
+
+                <dl class="permission-list">
+                    <dt>
+                        <label>
+                            {$vo.controlname}</label>
+                    </dt>
+                    <dd>
+                        <dl class="cl permission-list2">
+                            {volist name="vo.methods" id="method"}
+                            <dt>
+                                <label class="">
+                                    <input type="checkbox" value="{$method.id}" name="methodid[]" v-model="checkedMethod" id="user-Character-0-0-{$method.id}">
+                                    {$method.nodename}</label>
+                            </dt>
+                            {/volist}
+                        </dl>
+
+                    </dd>
+                </dl>
+                {/volist}
+
+            </div>
+        </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <button type="submit" class="btn btn-success radius" id="admin-role-save" name="admin-role-save"><i class="icon-ok"></i> 确定</button>
+            </div>
+        </div>
+    </form>
+</article>
+<!--_footer 作为公共模版分离出去-->
+{include file='public/_footer'}
+<!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+
+<script type="text/javascript">
+    $(function(){
+
+        $(".permission-list2 dd input:checkbox").click(function(){
+            var l =$(this).parent().parent().find("input:checked").length;
+            var l2=$(this).parents(".permission-list").find(".permission-list2 dd").find("input:checked").length;
+            if($(this).prop("checked")){
+                $(this).closest("dl").find("dt input:checkbox").prop("checked",true);
+                $(this).parents(".permission-list").find("dt").first().find("input:checkbox").prop("checked",true);
+            }
+            else{
+                if(l==0){
+                    $(this).closest("dl").find("dt input:checkbox").prop("checked",false);
+                }
+                if(l2==0){
+                    $(this).parents(".permission-list").find("dt").first().find("input:checkbox").prop("checked",false);
+                }
+            }
+        });
+
+        $("#form-admin-role-add").validate({
+            rules:{
+                roleName:{
+                    required:true,
+                },
+            },
+            onkeyup:false,
+            focusCleanup:true,
+            success:"valid",
+            submitHandler:function(form){
+                $(form).ajaxSubmit(function (data) {
+                    if(data.code){
+                        layer.msg("success");
+                        location.replace(location.href);
+                    }else{
+                        layer.msg(data.msg,{
+                            icon: 2,
+                            time: 3000 //2秒关闭（如果不配置，默认是3秒）
+                        }, function(){
+                            return;
+                        });
+                        return;
+
+                    }
+
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>
+<script>
+    var roleid = '{$roleid}';
+    $.ajax({
+        url: "getRoleAcc",
+        type: "POST",
+        dataType: "json",
+        async:false,
+        data: {roleid:roleid},
+        success: function (info) {
+            if(info.code){
+                arr = info.msg;
+            }else{
+                return;
+            }
+        }});
+    var myc = new Vue({
+        el:'#myvue',
+        data:{
+            checkedMethod:arr
+        },
+        watch:{
+            checkedMethod:function (newValue,oldValue) {
+                console.log(newValue);
+                console.log(oldValue);
+            }
+        }
+    })
+</script>
